@@ -1,2 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<teams><!-- Owner-managed XML teams. Example: <team id="unique-id" name="Team Name" owner="Owner Name"><pick position="QB" playerId="josh-allen"/></team> --></teams>
+<?xml version='1.0' encoding='utf-8'?>
+<teams>
+  <team id="3d2ef64f-ff9f-4f95-90c7-0d051da7cbdb" name="Team Eli" owner="Eli">
+    <pick position="QB" playerId="lamar-jackson" />
+    <pick position="RB" playerId="kyren-williams" />
+    <pick position="RB" playerId="kenneth-walker" />
+    <pick position="WR" playerId="terry-mclaurin" />
+    <pick position="WR" playerId="malik-nabers" />
+    <pick position="WR" playerId="george-pickens" />
+    <pick position="TE" playerId="travis-kelce" />
+    <pick position="K" playerId="tyler-bass" />
+  </team>
+</teams>
