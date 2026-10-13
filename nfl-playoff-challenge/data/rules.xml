@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rules season="2026" title="NFL Playoff Challenge" touchdownPoints="6" fieldGoalPoints="3" extraPointPoints="0" passingYardsPoints="0" rushingYardsPoints="0" receivingYardsPoints="0" maxPerNflTeam="1">
+  <roster><position code="QB" count="1"/><position code="RB" count="2"/><position code="WR" count="3"/><position code="TE" count="1"/><position code="K" count="1"/></roster>
+</rules>
