@@ -10,4 +10,14 @@
     <pick position="TE" playerId="travis-kelce" />
     <pick position="K" playerId="tyler-bass" />
   </team>
+  <team id="b90ffc1c-5520-4e2d-a592-e8e512c634b4" name="Test team" owner="Test">
+    <pick position="QB" playerId="jayden-daniels" />
+    <pick position="RB" playerId="josh-jacobs" />
+    <pick position="RB" playerId="kenneth-walker" />
+    <pick position="WR" playerId="justin-jefferson" />
+    <pick position="WR" playerId="davante-adams" />
+    <pick position="WR" playerId="malik-nabers" />
+    <pick position="TE" playerId="trey-mcbride" />
+    <pick position="K" playerId="kaimi-fairbairn" />
+  </team>
 </teams>
