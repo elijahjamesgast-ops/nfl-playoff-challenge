@@ -10,4 +10,14 @@
     <pick position="TE" playerId="trey-mcbride" />
     <pick position="K" playerId="kaimi-fairbairn" />
   </team>
+  <team id="d6886065-24dc-47a0-b97f-b909d6986ffc" name="Team Elih" owner="Elih">
+    <pick position="QB" playerId="dak-prescott" />
+    <pick position="RB" playerId="jahmyr-gibbs" />
+    <pick position="RB" playerId="derrick-henry" />
+    <pick position="WR" playerId="puka-nacua" />
+    <pick position="WR" playerId="nico-collins" />
+    <pick position="WR" playerId="malik-nabers" />
+    <pick position="TE" playerId="trey-mcbride" />
+    <pick position="K" playerId="harrison-butker" />
+  </team>
 </teams>
