@@ -12,7 +12,21 @@ function header(title,subtitle){return `<section class="intro"><h1>${escapeHtml(
 function leaderboard(){const ordered=[...teams].sort((a,b)=>teamPoints(b)-teamPoints(a)||a.name.localeCompare(b.name));app.innerHTML=header('Playoff leaderboard','2026 NFL season · Cumulative postseason scoring')+`<section class="panel"><div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap"><h2>Standings</h2><a class="button" href="#/create">+ Create team</a></div>${ordered.length?`<table><thead><tr><th>Rank</th><th>Team / Owner</th><th class="right">Points</th></tr></thead><tbody>${ordered.map((t,i)=>`<tr><td class="rank">${i+1}</td><td><a href="#/team/${encodeURIComponent(t.id)}">${escapeHtml(t.name)}</a><div class="muted">${escapeHtml(t.owner)}</div></td><td class="right"><strong>${teamPoints(t)}</strong></td></tr>`).join('')}</tbody></table>`:'<p class="muted">No teams yet. Be the first to submit a lineup!</p>'}</section><div class="notice">Touchdowns scored or thrown: 6 points · Field goals: 3 points · One player per NFL team. Scores update when data/scores.xml is updated.</div>`}
 function detail(id){const t=teams.find(x=>x.id===id);if(!t){app.innerHTML=header('Team not found','Return to the leaderboard.')+'<a href="#/">← Leaderboard</a>';return}app.innerHTML=`<p><a href="#/">← Leaderboard</a></p>`+header(t.name,'Owner: '+t.owner)+`<section class="panel"><div class="score">${teamPoints(t)} pts</div><p class="muted">Total playoff points</p><table><thead><tr><th>Position</th><th>Player</th><th>NFL team</th><th class="right">Points</th></tr></thead><tbody>${t.picks.map((id,i)=>{const p=players.find(x=>x.id===id);return `<tr><td>${escapeHtml(slots[i])}</td><td>${escapeHtml(p?.name||'Unknown player')}</td><td>${escapeHtml(p?.team||'—')}</td><td class="right">${points(id)}</td></tr>`}).join('')}</tbody></table></section>`}
 function create(){if(!submissionsOpen){app.innerHTML=header('Submissions closed','The organizer has closed new roster entries.')+'<a href="#/">← Leaderboard</a>';return}app.innerHTML=header('Create your team','Pick eight players. Each must belong to a different NFL team. Submissions are final.')+`<form class="panel" id="createForm"><div class="row"><div class="field"><label for="teamName">Team name</label><input id="teamName" maxlength="60" required placeholder="End Zone Elite"></div><div class="field"><label for="ownerName">Owner name</label><input id="ownerName" maxlength="60" required placeholder="Your name"></div></div><h2>Your roster</h2><div class="slots">${slots.map((pos,i)=>`<div class="slot"><label for="pick${i}">${pos} ${slots.slice(0,i+1).filter(x=>x===pos).length}</label><select id="pick${i}" required><option value="">Select ${pos}...</option>${players.filter(p=>p.position===pos&&p.team!=='FA').sort((a,b)=>a.name.localeCompare(b.name)).map(p=>`<option value="${escapeHtml(p.id)}">${escapeHtml(p.name)} — ${escapeHtml(p.team)}</option>`).join('')}</select><div class="hint" id="hint${i}">Choose a player</div></div>`).join('')}</div><div id="validation" aria-live="polite"></div><p class="muted">Once submitted, a team cannot be edited by its owner. The site administrator can edit XML data in GitHub.</p><button type="submit" id="submitBtn">Submit team</button></form>`;const form=document.getElementById('createForm');const selects=slots.map((_,i)=>document.getElementById('pick'+i));const box=document.getElementById('validation');function update(){const chosen=selects.map(s=>s.value);const usedTeams=new Set(chosen.map(id=>players.find(p=>p.id===id)?.team).filter(Boolean));selects.forEach((sel,i)=>{const current=sel.value;for(const opt of sel.options){if(!opt.value)continue;const p=players.find(x=>x.id===opt.value);opt.disabled=opt.value!==current&&usedTeams.has(p.team)}const p=players.find(x=>x.id===current);document.getElementById('hint'+i).textContent=p?p.team+' · '+p.name:'Choose a player'});const err=validate(chosen);box.innerHTML=chosen.every(Boolean)?`<div class="notice ${err.length?'error':'success'}">${err.length?escapeHtml(err.join(' ')):'✓ Valid roster — eight different NFL teams.'}</div>`:''}selects.forEach(s=>s.addEventListener('change',update));form.addEventListener('submit',async e=>{e.preventDefault();const name=document.getElementById('teamName').value.trim(),owner=document.getElementById('ownerName').value.trim(),picks=selects.map(s=>s.value);const errors=validate(picks);if(!name||!owner)errors.push('Enter a team and owner name.');if(errors.length){box.innerHTML=`<div class="notice error">${escapeHtml(errors.join(' '))}</div>`;return}if(!hasBackend()){box.innerHTML='<div class="notice error">Public submissions are not configured yet. The GitHub repository owner must complete the Supabase steps in SETUP.md. No team was saved.</div>';return}const btn=document.getElementById('submitBtn');btn.disabled=true;btn.textContent='Submitting…';try{const response=await fetch(cfg.supabaseUrl.replace(/\/$/,'')+'/rest/v1/submissions',{method:'POST',headers:{apikey:cfg.supabaseAnonKey,Authorization:'Bearer '+cfg.supabaseAnonKey,'Content-Type':'application/json',Prefer:'return=minimal'},body:JSON.stringify({name,owner,picks})});if(!response.ok)throw Error('Submission rejected ('+response.status+'). Submissions may be closed; contact the organizer.');form.innerHTML='<div class="notice success"><h2>Team submitted!</h2><p>Your roster has been sent for publication. It will appear on the leaderboard after the next XML sync.</p><a href="#/">Return to leaderboard</a></div>'}catch(err){box.innerHTML=`<div class="notice error">${escapeHtml(err.message)}</div>`}finally{btn.disabled=false;btn.textContent='Submit team'}})}
-function route(){const hash=decodeURIComponent(location.hash||'#/');if(hash==='#/create')create();else if(hash==='#/admin')admin();else if(hash.startsWith('#/team/'))detail(hash.slice(7));else leaderboard()}
+function route() {
+    const hash = decodeURIComponent(location.hash || '#/');
+
+    if (hash === '#/create') {
+        create();
+    } else if (hash === '#/admin') {
+        admin();
+    } else if (hash === '#/info') {
+        information();
+    } else if (hash.startsWith('#/team/')) {
+        detail(hash.slice(7));
+    } else {
+        leaderboard();
+    }
+}
 async function start(){try{const [p,t,s,r]=await Promise.all(['data/players.xml','data/teams.xml','data/scores.xml','data/rules.xml'].map(readXml));players=[...p.querySelectorAll('player')].map(attrs);teams=[...t.querySelectorAll('team')].map(e=>({...attrs(e),picks:[...e.querySelectorAll('pick')].map(x=>x.getAttribute('playerId'))}));scores=Object.fromEntries([...s.querySelectorAll('score')].map(e=>[e.getAttribute('playerId'),attrs(e)]));rules=attrs(r.documentElement);slots=[...r.querySelectorAll('position')].flatMap(e=>Array(Number(e.getAttribute('count'))).fill(e.getAttribute('code')));if(hasBackend()){try{const res=await fetch(cfg.supabaseUrl.replace(/\/$/,'')+'/rest/v1/competition_settings?select=submissions_open&id=eq.true',{headers:{apikey:cfg.supabaseAnonKey}});if(res.ok){const v=await res.json();submissionsOpen=v[0]?.submissions_open!==false}}catch(e){console.warn('Could not load submission status',e)}}window.addEventListener('hashchange',route);route()}catch(e){app.innerHTML=`<div class="notice error">Unable to load website data: ${escapeHtml(e.message)}. Use a web server or GitHub Pages, not a local file:// URL.</div>`}}
 start();
 
@@ -49,4 +63,205 @@ async function renderAdmin(){
   document.getElementById('deleteTeam').onclick=async()=>{if(!confirm('Permanently remove '+t.name+' from the published leaderboard?'))return;try{await adminCommand('delete_team',{id:t.id});notice('Deletion queued. Run GitHub XML sync to publish.') }catch(e){notice(e.message)}};
  };
  document.getElementById('saveScore').onclick=async()=>{try{await adminCommand('score_override',{playerId:document.getElementById('scorePlayer').value,adjustment:Number(document.getElementById('scoreAdjustment').value)});notice('Score correction queued. Run GitHub XML sync to publish.')}catch(e){notice(e.message)}};
+}
+
+function information() {
+    const counts = Object.entries(
+        slots.reduce((a, pos) => {
+            a[pos] = (a[pos] || 0) + 1;
+            return a;
+        }, {})
+    );
+
+    const td = Number(rules.touchdownPoints || 6);
+    const fg = Number(rules.fieldGoalPoints || 3);
+    const test = rules.scoringMode === 'test';
+
+    app.innerHTML = header(
+        'Rules & Information',
+        'Everything you need to know about the NFL Playoff Challenge.'
+    ) + `
+
+    <section class="panel">
+        <h2>How to Play</h2>
+
+        <p>
+            Build a roster of ${slots.length} NFL players.
+            Your fantasy team earns points based on your
+            players' performances throughout the NFL playoffs.
+            The fantasy team with the most total points wins.
+        </p>
+
+        <p>
+            When a player's NFL team is eliminated,
+            that player keeps all previously earned points
+            but cannot earn additional points.
+        </p>
+
+        <a class="button" href="#/create">Create Your Team</a>
+    </section>
+
+    <section class="panel">
+        <h2>Roster Requirements</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Position</th>
+                    <th class="right">Required</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${counts.map(([pos, n]) => `
+                    <tr>
+                        <td>${pos}</td>
+                        <td class="right">${n}</td>
+                    </tr>
+                `).join('')}
+
+                <tr>
+                    <td><strong>Total Players</strong></td>
+                    <td class="right">
+                        <strong>${slots.length}</strong>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="notice">
+            Only one player may be selected from each NFL team.
+        </div>
+    </section>
+
+    <section class="panel">
+        <h2>Scoring System</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Statistic</th>
+                    <th class="right">Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Passing Touchdown</td>
+                    <td class="right">${td}</td>
+                </tr>
+                <tr>
+                    <td>Rushing Touchdown</td>
+                    <td class="right">${td}</td>
+                </tr>
+                <tr>
+                    <td>Receiving Touchdown</td>
+                    <td class="right">${td}</td>
+                </tr>
+                <tr>
+                    <td>Other Credited Touchdowns</td>
+                    <td class="right">${td}</td>
+                </tr>
+                <tr>
+                    <td>Made Field Goal</td>
+                    <td class="right">${fg}</td>
+                </tr>
+                <tr>
+                    <td>Extra Point</td>
+                    <td class="right">0</td>
+                </tr>
+                <tr>
+                    <td>Two-Point Conversion</td>
+                    <td class="right">0</td>
+                </tr>
+                <tr>
+                    <td>Passing, Rushing or Receiving Yards</td>
+                    <td class="right">0</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Scoring Examples</h3>
+
+        <p>
+            A quarterback throws three touchdowns and
+            rushes for one touchdown:
+            <strong>${4 * td} points.</strong>
+        </p>
+
+        <p>
+            A wide receiver catches two touchdowns:
+            <strong>${2 * td} points.</strong>
+        </p>
+
+        <p>
+            A kicker makes three field goals:
+            <strong>${3 * fg} points.</strong>
+        </p>
+    </section>
+
+    <section class="panel">
+        <h2>Team Submission Rules</h2>
+
+        <ul>
+            <li>Each roster must contain all required positions.</li>
+            <li>Only one player per NFL team is allowed.</li>
+            <li>Rosters are final once submitted.</li>
+            <li>Participants cannot trade or replace players.</li>
+            <li>Eliminated players cannot be replaced.</li>
+        </ul>
+
+        <p>
+            Submissions are currently
+            <strong>${submissionsOpen ? 'OPEN' : 'CLOSED'}</strong>.
+        </p>
+    </section>
+
+    <section class="panel">
+        <h2>Automatic Score Updates</h2>
+
+        <p>
+            Player statistics are automatically retrieved
+            from ESPN throughout the competition.
+        </p>
+
+        <p>
+            The leaderboard displays cumulative fantasy points
+            earned throughout the competition.
+            Updates may be delayed during live games.
+        </p>
+
+        <p>
+            Administrators may manually correct scoring errors.
+        </p>
+
+        <a class="button" href="#/">View Leaderboard</a>
+    </section>
+
+    <section class="panel">
+        <h2>Competition Status</h2>
+
+        ${test ? `
+            <div class="notice">
+                <strong>Regular-Season Testing Mode</strong>
+                <p>
+                    The website is currently being tested using
+                    regular-season NFL games. These scores
+                    are not official playoff scores.
+                </p>
+            </div>
+        ` : `
+            <div class="notice">
+                <strong>Official Playoff Scoring Mode</strong>
+                <p>
+                    Only NFL postseason games count toward
+                    the competition.
+                </p>
+            </div>
+        `}
+
+        <p>
+            Official competition: 2026 NFL season playoffs,
+            January–February 2027.
+        </p>
+    </section>
+    `;
 }
