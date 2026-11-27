@@ -1,3 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
 <teams>
-  </teams>
+  <team id="63a5df8d-3dbe-40f3-beef-871dab65a92e" name="Team Eli" owner="Eli">
+    <pick position="QB" playerId="josh-allen" />
+    <pick position="RB" playerId="kyren-williams" />
+    <pick position="RB" playerId="saquon-barkley" />
+    <pick position="WR" playerId="tyreek-hill" />
+    <pick position="WR" playerId="malik-nabers" />
+    <pick position="WR" playerId="ja-marr-chase" />
+    <pick position="TE" playerId="trey-mcbride" />
+    <pick position="K" playerId="kaimi-fairbairn" />
+  </team>
+</teams>
