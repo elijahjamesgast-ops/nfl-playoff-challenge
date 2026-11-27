@@ -51,12 +51,15 @@ The example above awards 18 points (4 × 6 − 6). Use adjustment for scoring co
 
 **Limitations:** Without Supabase setup, the form validates but will explicitly refuse to save. With Supabase, anyone can submit without signing in, but submissions are publicly accessible only once synced into GitHub XML. The current database policy does not provide anti-spam or rate limiting; consider CAPTCHA / an Edge Function for a public launch. There is no authentication for owner names, and no limit on multiple entries per person. The public form cannot edit submissions, but you can modify published XML in GitHub. A later sync does not overwrite an existing team's XML record. If you delete a synced team in XML while leaving its submission in Supabase, the next sync will re-add it; delete the Supabase submission too to remove it permanently.
 
-## Scoring updates
-The **base build uses manual `data/scores.xml` updates**. Automatic score fetching is not implemented yet because it requires a selected, reliable NFL statistics provider and mapping of provider player IDs to these XML IDs. The XML score format is designed to accept a future GitHub Action that fetches playoff stats and applies manual adjustments. Do not assume scores are live until that is configured.
-
 ## Other launch checks
 - `data/players.xml` is a **starter list**, not a confirmed 2027 playoff player pool. Check every player's team and playoff eligibility before accepting real entries.
 - Scores are all zero until populated.
 - The list of selectable teams currently includes non-playoff teams; filter/curate `players.xml` after playoff teams are known.
 - Host the files with GitHub Pages or a local HTTP server (e.g. `python -m http.server 8000`), not by opening `index.html` directly.
 - GitHub Pages and Supabase free tiers have usage limits and service terms that may change.
+
+## Automatic ESPN scoring
+
+Test mode is enabled in data/rules.xml. It counts regular-season games starting November 26, 2026, cumulatively, using individual daily ESPN scoreboard requests. Run `python scripts/sync_scores.py` locally or use Actions → Update NFL playoff scores → Run workflow. Scheduled updates run every two hours at minute 15 UTC. No new secrets are needed. Manual adjustments are preserved. Review unmatched player names in logs. ESPN is unofficial and unusual touchdown categories need verification.
+
+Before playoffs, change scoringMode="test" to scoringMode="playoffs" in data/rules.xml and reset scores.xml touchdowns, fieldGoals and any test adjustments to zero. The playoff mode rebuilds only postseason totals. Do not merely reset scores while test mode is enabled, because the next sync will restore test totals.
