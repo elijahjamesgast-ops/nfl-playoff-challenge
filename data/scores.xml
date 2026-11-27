@@ -1,11 +1,13 @@
 <?xml version='1.0' encoding='utf-8'?>
-<scores updated="2026-11-27T01:21:32+00:00">
+<scores updated="2026-11-27T10:55:24+00:00">
   <score playerId="lamar-jackson" touchdowns="0" fieldGoals="0" adjustment="-6" />
   <score playerId="jake-bates" touchdowns="0" fieldGoals="2" />
   <score playerId="sam-laporta" touchdowns="1" fieldGoals="0" />
   <score playerId="jahmyr-gibbs" touchdowns="3" fieldGoals="0" />
   <score playerId="dak-prescott" touchdowns="3" fieldGoals="0" />
   <score playerId="jared-goff" touchdowns="1" fieldGoals="0" />
-  <score playerId="jake-elliott" touchdowns="0" fieldGoals="1" />
+  <score playerId="jake-elliott" touchdowns="0" fieldGoals="2" />
   <score playerId="brandon-aubrey" touchdowns="0" fieldGoals="1" />
+  <score playerId="tyler-bass" touchdowns="0" fieldGoals="2" />
+  <score playerId="harrison-butker" touchdowns="0" fieldGoals="1" />
 </scores>
