@@ -1,5 +1,5 @@
 """Merge submissions and admin commands into XML. Existing XML edits remain authoritative.
-Admin commands are applied exactly once via data/admin_applied.json.
+Admin commands are applied exactly once via data/admin_applied.json. The 
 """
 import json, os, re, urllib.request, urllib.parse, xml.etree.ElementTree as ET
 from pathlib import Path
