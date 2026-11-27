@@ -20,4 +20,24 @@
     <pick position="TE" playerId="trey-mcbride" />
     <pick position="K" playerId="harrison-butker" />
   </team>
+  <team id="b2780626-650c-4d63-96f5-b50d595df863" name="TestKG" owner="KG">
+    <pick position="QB" playerId="brock-purdy" />
+    <pick position="RB" playerId="kenneth-walker" />
+    <pick position="RB" playerId="jahmyr-gibbs" />
+    <pick position="WR" playerId="ja-marr-chase" />
+    <pick position="WR" playerId="mike-evans" />
+    <pick position="WR" playerId="ceedee-lamb" />
+    <pick position="TE" playerId="trey-mcbride" />
+    <pick position="K" playerId="cameron-dicker" />
+  </team>
+  <team id="d80410b1-79d9-4d47-bce8-38fcb89d827a" name="Trace" owner="Trace">
+    <pick position="QB" playerId="josh-allen" />
+    <pick position="RB" playerId="christian-mccaffrey" />
+    <pick position="RB" playerId="jahmyr-gibbs" />
+    <pick position="WR" playerId="justin-jefferson" />
+    <pick position="WR" playerId="ja-marr-chase" />
+    <pick position="WR" playerId="davante-adams" />
+    <pick position="TE" playerId="travis-kelce" />
+    <pick position="K" playerId="kaimi-fairbairn" />
+  </team>
 </teams>
